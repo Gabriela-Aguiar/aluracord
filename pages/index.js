@@ -146,6 +146,8 @@ return (
               minHeight: '240px',
             }}
           >
+            { username.length > 2 &&
+            <>
             <Image
               styleSheet={{
                 borderRadius: '50%',
@@ -164,6 +166,7 @@ return (
             >
               {username}
             </Text>
+            </>}
           </Box>
           {/* Photo Area */}
         </Box>
