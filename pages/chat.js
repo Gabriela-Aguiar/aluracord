@@ -1,22 +1,53 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_API
+const SUPABASE_URL = 'https://pssmomkrfwpvmjjaxwhb.supabase.co'
+const supabaseCliente = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
 
 export default function ChatPage() {
     //lógica 
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([])
 
+    React.useEffect(() => {
+        supabaseCliente
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+            // console.log('dadosDaConsulta:', data);
+            setListaDeMensagens(data)
+         });
+    }, [])
+    
+
+
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaDeMensagens.length + 1,
-            de: 'gabriela',
+            // id: listaDeMensagens.length + 1,
+            de: 'Gabriela-Aguiar',
             texto: novaMensagem,
         }
-        setListaDeMensagens([
-            mensagem,
-            ...listaDeMensagens,
-        ]);
+
+
+        supabaseCliente
+            .from('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then(({ data }) => {
+                setListaDeMensagens([
+                    data[0],
+                    ...listaDeMensagens,
+                ]);
+            });
+
+
+        
         setMensagem('');
     }
     // lógica 
@@ -124,7 +155,7 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log('MessageList', props);
+    // console.log('MessageList', props);
     return (
         <Box
             tag="ul"
@@ -138,6 +169,7 @@ function MessageList(props) {
             }}
         >
             {props.mensagens.map((mensagem) => {
+                console.log(mensagem.de)
                 return (
                     <Text
                     key={mensagem.id}
@@ -164,7 +196,7 @@ function MessageList(props) {
                                 display: 'inline-block',
                                 marginRight: '8px',
                             }}
-                            src={`https://github.com/vanessametonini.png`}
+                            src={`https://github.com/${mensagem.de}.png`}
                         />
                         <Text tag="strong">
                             {mensagem.de}
